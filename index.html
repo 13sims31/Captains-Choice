@@ -37,7 +37,7 @@
     const resultBox = document.getElementById('result-box');
     const pickButton = document.getElementById('pick-button');
     
-    // --- 1. Eingabe verarbeiten (wie zuvor) ---
+    // --- 1. Eingabe verarbeiten ---
     if (!input.trim()) {
         resultBox.textContent = "Bitte geben Sie Namen in das Feld ein.";
         return;
@@ -54,47 +54,63 @@
         return;
     }
 
-    // --- 2. Countdown-Logik starten ---
-
-    // Deaktiviert den Button, um Mehrfachklicks während des Ziehens zu verhindern
-    pickButton.disabled = true;
-
-    let countdown = 3; // Startet den Countdown bei 3 Sekunden
+    // --- 2. Countdown-Vorbereitung ---
     
-    // Zeigt den ersten Wert sofort an
-    resultBox.textContent = `Zufälliger Name wird gezogen in: ${countdown}...`;
+    pickButton.disabled = true; // Button deaktivieren
+    let countdown = 10; // Fester Startwert
+    
+    // Setzen der Grenzen für das zufällige Intervall (in Millisekunden)
+    // Beispiel: Zufällige Verzögerung zwischen 500ms (0.5s) und 3000ms (1.5s)
+    const minIntervalMs = 500;
+    const maxIntervalMs = 3000;
+    
+    // Startet den rekursiven Zählprozess
+    countDownRecursive(countdown, names, resultBox, pickButton, minIntervalMs, maxIntervalMs);
+}
 
-    // Startet ein Intervall, das jede Sekunde (1000ms) läuft
-    const countdownInterval = setInterval(() => {
-        countdown--;
+// Funktion, die sich selbst aufruft (rekursiv) mit neuer, zufälliger Wartezeit
+function countDownRecursive(currentCount, names, resultBox, pickButton, minMs, maxMs) {
+    
+    // 1. Zählstand anzeigen
+    resultBox.textContent = `Zufälliger Name wird gezogen in: ${currentCount}...`;
+
+    if (currentCount <= 0) {
+        // Zählstand erreicht 0: Ziehung ausführen
+        drawFinalName(names, pickButton, resultBox);
+        return;
+    }
+
+    // 2. Zufällige Verzögerungszeit generieren
+    // Math.floor(Math.random() * (max - min + 1)) + min
+    // Generiert eine Verzögerung zwischen 500ms und 3000ms
+    const randomDelay = Math.floor(Math.random() * (maxMs - minMs + 1)) + minMs;
+
+    // 3. Rekursiver Aufruf mit neuer Wartezeit
+    // Wartet die zufällige Zeit, bevor die Funktion erneut aufgerufen wird (currentCount - 1)
+    setTimeout(() => {
+        // Reduziere den Zähler für den nächsten Schritt
+        const nextCount = currentCount - 1; 
         
-        if (countdown > 0) {
-            // Aktualisiert die Anzeige des Countdowns
-            resultBox.textContent = `Zufälliger Name wird gezogen in: ${countdown}...`;
-        } else {
-            // Stoppt den Timer, sobald der Countdown 0 erreicht hat
-            clearInterval(countdownInterval);
-            
-            // Führt die eigentliche Ziehung durch
-            drawFinalName(names);
-        }
-    }, 1000);
+        // Ruft sich selbst auf
+        countDownRecursive(nextCount, names, resultBox, pickButton, minMs, maxMs);
+    }, randomDelay);
 }
 
 
-function drawFinalName(names) {
+function drawFinalName(names, pickButton, resultBox) {
     // Holt den zufälligen Index
     const randomIndex = Math.floor(Math.random() * names.length);
     const selectedName = names[randomIndex];
     
     // Gibt das Endergebnis aus
-    document.getElementById('result-box').textContent = selectedName;
+    resultBox.textContent = selectedName;
     
     // Aktiviert den Button wieder für eine neue Ziehung
-    document.getElementById('pick-button').disabled = false; 
+    pickButton.disabled = false; 
 }
     </script>
 
 </body>
 
 </html>
+
