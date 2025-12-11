@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Zufallsgenerator</title>
+    <title>Captains Choice</title>
     <style>
         /* CSS wird der Einfachheit halber hier eingebettet */
         body { font-family: Arial, sans-serif; max-width: 600px; margin: 40px auto; padding: 20px; background-color: #f4f4f9; }
@@ -17,57 +17,84 @@
 </head>
 <body>
 
-    <h1>Zufalls-Namensgenerator 🎲</h1>
+    <h1>Captains Choice</h1>
 
     <div class="hint">
-        Geben Sie die Namen ein. Sie können Kommas, Semikolons oder Zeilenumbrüche verwenden.
+        Enter the Names here.
     </div>
 
     <textarea id="name-input" placeholder="Name 1, Name 2; Name 3&#10;Name 4"></textarea>
 
-    <button onclick="pickRandomName()">Namen ziehen</button>
+    <button id="pick-button" onclick="pickRandomName()">Draw Winner</button>
 
     <div id="result-box">
-        Der zufällig ausgewählte Name erscheint hier.
+        The Winner is:
     </div>
 
     <script>
-        function pickRandomName() {
-    // 1. Eingabe aus dem Textfeld holen
+    function pickRandomName() {
     const input = document.getElementById('name-input').value;
+    const resultBox = document.getElementById('result-box');
+    const pickButton = document.getElementById('pick-button');
     
+    // --- 1. Eingabe verarbeiten (wie zuvor) ---
     if (!input.trim()) {
-        document.getElementById('result-box').textContent = "Bitte geben Sie Namen in das Feld ein.";
+        resultBox.textContent = "Bitte geben Sie Namen in das Feld ein.";
         return;
     }
 
-    // 2. Multidelimiter-Verarbeitung (Zeilenumbrüche, Kommas, Semikolons)
-    // Ersetze alle Trennzeichen durch einheitliches Trennzeichen (z.B. Komma) und teile dann in ein Array auf
-    // Regulärer Ausdruck: [\n,;]+[\s]*
-    // [\n,;] = Zeilenumbruch ODER Komma ODER Semikolon
-    // [\s]* = gefolgt von beliebig vielen Leerzeichen
     const delimiterPattern = /[\n,;]+[\s]*/g;
-    
     let names = input
-        .split(delimiterPattern) // Aufteilen anhand der gefundenen Muster
-        .map(name => name.trim()) // Führende/nachlaufende Leerzeichen entfernen
-        .filter(name => name.length > 0); // Leere Einträge entfernen (z.B. wenn mehrere Delimiter hintereinander stehen)
+        .split(delimiterPattern)
+        .map(name => name.trim())
+        .filter(name => name.length > 0);
 
     if (names.length === 0) {
-        document.getElementById('result-box').textContent = "Es wurden keine gültigen Namen gefunden. Prüfen Sie die Eingabe.";
+        resultBox.textContent = "Es wurden keine gültigen Namen gefunden.";
         return;
     }
 
-    // 3. Zufallsauswahl (Formel für zufälligen Index)
-    // Math.random() gibt eine Zahl zwischen 0 (inklusive) und 1 (exklusive) zurück
-    // Math.floor(Zufallszahl * Array-Länge) gibt einen Index von 0 bis Array-Länge - 1
-    const randomIndex = Math.floor(Math.random() * names.length);
+    // --- 2. Countdown-Logik starten ---
+
+    // Deaktiviert den Button, um Mehrfachklicks während des Ziehens zu verhindern
+    pickButton.disabled = true;
+
+    let countdown = 3; // Startet den Countdown bei 3 Sekunden
     
-    // 4. Ergebnis ausgeben
+    // Zeigt den ersten Wert sofort an
+    resultBox.textContent = `Zufälliger Name wird gezogen in: ${countdown}...`;
+
+    // Startet ein Intervall, das jede Sekunde (1000ms) läuft
+    const countdownInterval = setInterval(() => {
+        countdown--;
+        
+        if (countdown > 0) {
+            // Aktualisiert die Anzeige des Countdowns
+            resultBox.textContent = `Zufälliger Name wird gezogen in: ${countdown}...`;
+        } else {
+            // Stoppt den Timer, sobald der Countdown 0 erreicht hat
+            clearInterval(countdownInterval);
+            
+            // Führt die eigentliche Ziehung durch
+            drawFinalName(names);
+        }
+    }, 1000);
+}
+
+
+function drawFinalName(names) {
+    // Holt den zufälligen Index
+    const randomIndex = Math.floor(Math.random() * names.length);
     const selectedName = names[randomIndex];
+    
+    // Gibt das Endergebnis aus
     document.getElementById('result-box').textContent = selectedName;
+    
+    // Aktiviert den Button wieder für eine neue Ziehung
+    document.getElementById('pick-button').disabled = false; 
 }
     </script>
 
 </body>
+
 </html>
