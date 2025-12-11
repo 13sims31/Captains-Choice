@@ -18,7 +18,16 @@
 <body>
 
     <h1>Captains Choice</h1>
+    <audio id="countdown-sound" loop>
+        <source src="useless-speach.mp3" type="audio/mpeg"> 
+        No Audio
+    </audio>
 
+    <audio id="winner-sound">
+    <source src="victory-sound.mp3" type="audio/mpeg"> 
+    No Audio
+    </audio>
+    
     <div class="hint">
         Enter Names here.
     </div>
@@ -32,47 +41,69 @@
     </div>
 
     <script>
-    function pickRandomName() {
+    // Funktion 1: Steuert den Countdown-Sound (Sprache)
+function toggleCountdownSound(action) {
+    const sound = document.getElementById('countdown-sound');
+    
+    if (action === 'play') {
+        sound.currentTime = 0; // Stellt den Sound auf den Anfang
+        sound.play().catch(error => {
+            console.error("Wiedergabe des Countdown-Sounds fehlgeschlagen:", error);
+        });
+    } else if (action === 'stop') {
+        sound.pause();
+        sound.currentTime = 0; // Setzt den Sound zurück
+    }
+}
+
+// Funktion 2: Spielt den Gewinner-Sound einmal ab
+function playWinnerSound() {
+    const winnerSound = document.getElementById('winner-sound');
+    winnerSound.currentTime = 0; // Stellt sicher, dass der Sound von vorne beginnt
+    winnerSound.play().catch(error => {
+        console.error("Wiedergabe des Gewinner-Sounds fehlgeschlagen:", error);
+    });
+}
+
+
+// HAUPTFUNKTION: Startet den gesamten Prozess
+function pickRandomName() {
     const input = document.getElementById('name-input').value;
     const resultBox = document.getElementById('result-box');
     const pickButton = document.getElementById('pick-button');
     
-    // --- 1. Eingabe verarbeiten ---
+    // --- 1. Validierung und Eingabeverarbeitung (wie zuvor) ---
     if (!input.trim()) {
-        resultBox.textContent = "Please enter Names here";
+        resultBox.textContent = "Bitte geben Sie Namen in das Feld ein.";
         return;
     }
-
     const delimiterPattern = /[\n,;]+[\s]*/g;
-    let names = input
-        .split(delimiterPattern)
-        .map(name => name.trim())
-        .filter(name => name.length > 0);
-
+    let names = input.split(delimiterPattern).map(name => name.trim()).filter(name => name.length > 0);
     if (names.length === 0) {
-        resultBox.textContent = "No valid Names!";
+        resultBox.textContent = "Es wurden keine gültigen Namen gefunden.";
         return;
     }
+
+    // --- SOUND STARTEN ---
+    toggleCountdownSound('play');
 
     // --- 2. Countdown-Vorbereitung ---
     
-    pickButton.disabled = true; // Button deaktivieren
+    pickButton.disabled = true;
     let countdown = 10; // Fester Startwert
     
-    // Setzen der Grenzen für das zufällige Intervall (in Millisekunden)
-    // Beispiel: Zufällige Verzögerung zwischen 500ms (0.5s) und 5000ms (5s)
     const minIntervalMs = 500;
-    const maxIntervalMs = 5000;
+    const maxIntervalMs = 1500;
     
     // Startet den rekursiven Zählprozess
     countDownRecursive(countdown, names, resultBox, pickButton, minIntervalMs, maxIntervalMs);
 }
 
-// Funktion, die sich selbst aufruft (rekursiv) mit neuer, zufälliger Wartezeit
+
+// REKURSIVE FUNKTION: Zählt mit zufälligem Intervall herunter
 function countDownRecursive(currentCount, names, resultBox, pickButton, minMs, maxMs) {
     
-    // 1. Zählstand anzeigen
-    resultBox.textContent = `Winner will be chosen in: ${currentCount}...`;
+    resultBox.textContent = `Zufälliger Name wird gezogen in: ${currentCount}...`;
 
     if (currentCount <= 0) {
         // Zählstand erreicht 0: Ziehung ausführen
@@ -80,37 +111,38 @@ function countDownRecursive(currentCount, names, resultBox, pickButton, minMs, m
         return;
     }
 
-    // 2. Zufällige Verzögerungszeit generieren
-    // Math.floor(Math.random() * (max - min + 1)) + min
-    // Generiert eine Verzögerung zwischen 500ms und 5000ms
+    // Zufällige Verzögerungszeit generieren
     const randomDelay = Math.floor(Math.random() * (maxMs - minMs + 1)) + minMs;
 
-    // 3. Rekursiver Aufruf mit neuer Wartezeit
-    // Wartet die zufällige Zeit, bevor die Funktion erneut aufgerufen wird (currentCount - 1)
+    // Rekursiver Aufruf mit neuer Wartezeit
     setTimeout(() => {
-        // Reduziere den Zähler für den nächsten Schritt
         const nextCount = currentCount - 1; 
-        
-        // Ruft sich selbst auf
         countDownRecursive(nextCount, names, resultBox, pickButton, minMs, maxMs);
     }, randomDelay);
 }
 
 
+// FINALE FUNKTION: Gibt den Gewinner aus
 function drawFinalName(names, pickButton, resultBox) {
-    // Holt den zufälligen Index
+    
+    // 1. Countdown-Sound stoppen
+    toggleCountdownSound('stop'); 
+    
+    // 2. Gewinner-Sound starten
+    playWinnerSound();
+
+    // 3. Ergebnis ausgeben
     const randomIndex = Math.floor(Math.random() * names.length);
     const selectedName = names[randomIndex];
-    
-    // Gibt das Endergebnis aus
     resultBox.textContent = selectedName;
     
-    // Aktiviert den Button wieder für eine neue Ziehung
+    // 4. Button aktivieren
     pickButton.disabled = false; 
 }
-    </script>
+</script>
 
 </body>
 </html>
+
 
 
