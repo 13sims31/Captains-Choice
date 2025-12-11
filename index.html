@@ -42,19 +42,30 @@
 
     <script>
     // Funktion 1: Steuert den Countdown-Sound (Sprache)
-function toggleCountdownSound(action) {
+    // Funktion 1: Steuert den Countdown-Sound (Sprache)
+    function toggleCountdownSound(action) {
     const sound = document.getElementById('countdown-sound');
     
+    // ZUSÄTZLICHE PRÜFUNG: Überprüfen Sie, ob der Browser die Audioquelle überhaupt erkennt
+    console.log(`Versuche ${action} für Countdown-Sound. Quelle: ${sound.currentSrc}`);
+
     if (action === 'play') {
+        // Zuerst prüfen, ob die Quelle geladen wurde, sonst wird .play() fehlschlagen
+        if (!sound.currentSrc) {
+             console.error("Countdown-Audioquelle ist nicht geladen. Prüfen Sie den Pfad 'useless-speach.mp3'.");
+             return;
+        }
+
         sound.currentTime = 0; // Stellt den Sound auf den Anfang
         sound.play().catch(error => {
-            console.error("Wiedergabe des Countdown-Sounds fehlgeschlagen:", error);
+             // DIESE FEHLERMELDUNG IST WICHTIG! SIE ZEIGT DEN BLOCKIERUNGSGRUND.
+             console.error("Wiedergabe blockiert/fehlgeschlagen (Browser-Regel):", error);
         });
     } else if (action === 'stop') {
         sound.pause();
         sound.currentTime = 0; // Setzt den Sound zurück
     }
-}
+    }
 
 // Funktion 2: Spielt den Gewinner-Sound einmal ab
 function playWinnerSound() {
@@ -74,13 +85,13 @@ function pickRandomName() {
     
     // --- 1. Validierung und Eingabeverarbeitung (wie zuvor) ---
     if (!input.trim()) {
-        resultBox.textContent = "Bitte geben Sie Namen in das Feld ein.";
+        resultBox.textContent = "Please enter the names";
         return;
     }
     const delimiterPattern = /[\n,;]+[\s]*/g;
     let names = input.split(delimiterPattern).map(name => name.trim()).filter(name => name.length > 0);
     if (names.length === 0) {
-        resultBox.textContent = "Es wurden keine gültigen Namen gefunden.";
+        resultBox.textContent = "No valid names.";
         return;
     }
 
@@ -92,8 +103,8 @@ function pickRandomName() {
     pickButton.disabled = true;
     let countdown = 10; // Fester Startwert
     
-    const minIntervalMs = 500;
-    const maxIntervalMs = 1500;
+    const minIntervalMs = 300;
+    const maxIntervalMs = 5000;
     
     // Startet den rekursiven Zählprozess
     countDownRecursive(countdown, names, resultBox, pickButton, minIntervalMs, maxIntervalMs);
@@ -103,7 +114,7 @@ function pickRandomName() {
 // REKURSIVE FUNKTION: Zählt mit zufälligem Intervall herunter
 function countDownRecursive(currentCount, names, resultBox, pickButton, minMs, maxMs) {
     
-    resultBox.textContent = `Zufälliger Name wird gezogen in: ${currentCount}...`;
+    resultBox.textContent = `Winner will be shown in: ${currentCount}...`;
 
     if (currentCount <= 0) {
         // Zählstand erreicht 0: Ziehung ausführen
@@ -143,7 +154,3 @@ function drawFinalName(names, pickButton, resultBox) {
 
 </body>
 </html>
-
-
-
-
