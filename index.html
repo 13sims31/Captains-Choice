@@ -137,9 +137,12 @@ function countDownRecursive(currentCount, names, resultBox, pickButton, minMs, m
 function drawFinalName(names, pickButton, resultBox) {
     
     // 1. Countdown-Sound stoppen
-    toggleCountdownSound('stop'); 
-    
-    // 2. Gewinner-Sound starten
+    // NEU: Verzögere den Stopp-Befehl leicht, um den AbortError zu vermeiden
+    setTimeout(() => {
+        toggleCountdownSound('stop'); 
+    }, 100); // 100 Millisekunden Verzögerung
+
+    // 2. Gewinner-Sound starten (kann sofort starten)
     playWinnerSound();
 
     // 3. Ergebnis ausgeben
@@ -154,3 +157,4 @@ function drawFinalName(names, pickButton, resultBox) {
 
 </body>
 </html>
+
