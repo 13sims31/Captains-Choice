@@ -20,7 +20,7 @@
     <h1>Captains Choice</h1>
 
     <div class="hint">
-        Enter the Names here.
+        Enter Names here.
     </div>
 
     <textarea id="name-input" placeholder="Name 1, Name 2; Name 3&#10;Name 4"></textarea>
@@ -39,7 +39,7 @@
     
     // --- 1. Eingabe verarbeiten ---
     if (!input.trim()) {
-        resultBox.textContent = "Bitte geben Sie Namen in das Feld ein.";
+        resultBox.textContent = "Please enter Names here";
         return;
     }
 
@@ -50,7 +50,7 @@
         .filter(name => name.length > 0);
 
     if (names.length === 0) {
-        resultBox.textContent = "Es wurden keine gültigen Namen gefunden.";
+        resultBox.textContent = "No valid Names!";
         return;
     }
 
@@ -60,9 +60,9 @@
     let countdown = 10; // Fester Startwert
     
     // Setzen der Grenzen für das zufällige Intervall (in Millisekunden)
-    // Beispiel: Zufällige Verzögerung zwischen 500ms (0.5s) und 3000ms (1.5s)
+    // Beispiel: Zufällige Verzögerung zwischen 500ms (0.5s) und 5000ms (5s)
     const minIntervalMs = 500;
-    const maxIntervalMs = 3000;
+    const maxIntervalMs = 5000;
     
     // Startet den rekursiven Zählprozess
     countDownRecursive(countdown, names, resultBox, pickButton, minIntervalMs, maxIntervalMs);
@@ -72,7 +72,7 @@
 function countDownRecursive(currentCount, names, resultBox, pickButton, minMs, maxMs) {
     
     // 1. Zählstand anzeigen
-    resultBox.textContent = `Zufälliger Name wird gezogen in: ${currentCount}...`;
+    resultBox.textContent = `Winner will be chosen in: ${currentCount}...`;
 
     if (currentCount <= 0) {
         // Zählstand erreicht 0: Ziehung ausführen
@@ -82,7 +82,7 @@ function countDownRecursive(currentCount, names, resultBox, pickButton, minMs, m
 
     // 2. Zufällige Verzögerungszeit generieren
     // Math.floor(Math.random() * (max - min + 1)) + min
-    // Generiert eine Verzögerung zwischen 500ms und 3000ms
+    // Generiert eine Verzögerung zwischen 500ms und 5000ms
     const randomDelay = Math.floor(Math.random() * (maxMs - minMs + 1)) + minMs;
 
     // 3. Rekursiver Aufruf mit neuer Wartezeit
@@ -111,6 +111,6 @@ function drawFinalName(names, pickButton, resultBox) {
     </script>
 
 </body>
-
 </html>
+
 
